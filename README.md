@@ -20,37 +20,26 @@ Il provider azurerm è il principale strumento di interazione tra Terraform e Az
 La configurazione base del provider azurerm richiede la definizione del provider stesso all’interno di un blocco terraform, indicando la versione desiderata, seguita da un blocco provider che definisce eventuali opzioni. Un esempio tipico include la creazione di un gruppo di risorse in una specifica regione geografica. Questo tipo di risorsa rappresenta l’unità logica base in cui vengono organizzate le risorse Azure.
 
 **Esempio di configurazione:**
-```
+```hcl
 terraform {
-
-required\_providers {
-
-azurerm = {
-
-source = "hashicorp/azurerm" # Specifica da dove scaricare il provider (registro ufficiale HashiCorp)
-
-version = "~> 3.0" # Indica che si vuole usare una versione 3.x del provider azurerm
-
-}
-
-}
-
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm" # Specifica da dove scaricare il provider
+      version = "~> 3.0"             # Usa una versione 3.x del provider
+    }
+  }
 }
 
 provider "azurerm" {
-
-features {} # Configurazione richiesta per il provider; può contenere opzioni avanzate, qui lasciato vuoto
-
+  features {} # Configurazione richiesta dal provider (qui vuota)
 }
 
-resource "azurerm\_resource\_group" "example" {
-
-name = "example-resources" # Nome del gruppo di risorse che sarà creato
-
-location = "West Europe" # Regione geografica in cui sarà creato il gruppo di risorse
-
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"  # Nome del gruppo di risorse
+  location = "West Europe"        # Regione geografica
 }
 ```
+
 
 **AzureAD (Azure Active Directory)**
 
@@ -60,21 +49,17 @@ Questo provider è utile, ad esempio, in scenari dove è necessario creare dinam
 
 **Esempio:**
 
+```hcl
 provider "azuread" {
-
-tenant\_id = "<tenant\_id>" # ID del tenant di Azure Active Directory in cui operare
-
+  tenant_id = "<tenant_id>" # ID del tenant di Azure Active Directory
 }
 
-resource "azuread\_user" "example" {
-
-user\_principal\_name = "utente@example.com" # Nome principale dell'utente (equivale all'email di accesso)
-
-display\_name = "Utente Esempio" # Nome visualizzato dell'utente
-
-password = "Password123!" # Password iniziale dell'utente (andrebbe gestita come variabile sicura)
-
+resource "azuread_user" "example" {
+  user_principal_name = "utente@example.com" # Email di accesso dell'utente
+  display_name        = "Utente Esempio"     # Nome visualizzato
+  password            = "Password123!"       # Password iniziale (meglio usare una variabile sicura)
 }
+```
 
 **Azure DevOps**
 
@@ -84,21 +69,18 @@ Utilizzando questo provider, è possibile automatizzare la creazione e la config
 
 **Esempio:**
 
+```hcl
 provider "azuredevops" {
-
-org\_service\_url = "https://dev.azure.com/<organizzazione>" # URL dell'organizzazione Azure DevOps
-
-personal\_access\_token = var.pat # Token di accesso personale (PAT), definito come variabile
-
+  org_service_url       = "https://dev.azure.com/<organizzazione>" # URL dell'organizzazione Azure DevOps
+  personal_access_token = var.pat                                   # Token di accesso personale (PAT) definito come variabile
 }
 
-resource "azuredevops\_project" "example" {
-
-name = "TerraformProject" # Nome del progetto DevOps da creare
-
-description = "Progetto gestito con Terraform" # Descrizione del progetto
-
+resource "azuredevops_project" "example" {
+  name        = "TerraformProject"                     # Nome del progetto DevOps da creare
+  description = "Progetto gestito con Terraform"       # Descrizione del progetto
 }
+```
+
 
 **AzAPI**
 
@@ -119,23 +101,20 @@ Se un'API è **REST**, significa che:
 
 **Esempio:**
 
-provider "azapi" {} 
-
-\# Inizializza il provider AzAPI, utilizzato per accedere direttamente alle REST API di Azure
-
-\# Utile per risorse non ancora supportate dal provider "azurerm"
-
-resource "azapi\_resource" "custom" {
-
-type = "Microsoft.Resources/resourceGroups@2021-04-01" # Specifica il tipo di risorsa Azure e la versione dell’API usata
-
-name = "azapi-rg" # Nome della risorsa da creare (in questo caso un resource group)
-
-location = "West Europe" # Località geografica dove sarà creata la risorsa
-
-parent\_id = "/subscriptions/<subscription-id>" # ID della sottoscrizione Azure sotto cui creare la risorsa
-
+```hcl
+provider "azapi" {
+  # Inizializza il provider AzAPI, usato per accedere direttamente alle REST API di Azure
+  # Utile per risorse non ancora supportate dal provider "azurerm"
 }
+
+resource "azapi_resource" "custom" {
+  type     = "Microsoft.Resources/resourceGroups@2021-04-01" # Tipo di risorsa e versione API
+  name     = "azapi-rg"                                      # Nome della risorsa (resource group)
+  location = "West Europe"                                   # Località geografica
+  parent_id = "/subscriptions/<subscription-id>"             # ID della sottoscrizione Azure
+}
+```
+
 
 **Azure Stack**
 
@@ -219,49 +198,34 @@ Supponiamo di dover creare un'infrastruttura Azure per ospitare un'applicazione 
 
 Codice Terraform di esempio:
 
+```hcl
 provider "azurerm" {
-
-features {} # Obbligatorio per inizializzare il provider azurerm
-
-resource "azurerm\_resource\_group" "rg" {
-
-name = "webapp-rg" # Nome del gruppo di risorse che conterrà tutti gli elementi
-
-location = "West Europe" # Regione Azure dove sarà creato il gruppo di risorse
-
+  features {} # Obbligatorio per inizializzare il provider azurerm
 }
 
-resource "azurerm\_app\_service\_plan" "asp" {
-
-name = "webapp-plan" # Nome del piano di servizio (hosting plan)
-
-location = azurerm\_resource\_group.rg.location # Stessa località del gruppo di risorse
-
-resource\_group\_name = azurerm\_resource\_group.rg.name # Associa il piano al gruppo di risorse
-
-sku {
-
-tier = "Standard" # Tier del piano: "Standard" offre funzionalità di produzione
-
-size = "S1" # Dimensione dell'istanza (S1 = Small Standard)
-
+resource "azurerm_resource_group" "rg" {
+  name     = "webapp-rg"         # Nome del gruppo di risorse
+  location = "West Europe"       # Regione Azure dove sarà creato
 }
 
+resource "azurerm_app_service_plan" "asp" {
+  name                = "webapp-plan"                    # Nome del piano di servizio
+  location            = azurerm_resource_group.rg.location # Stessa località del resource group
+  resource_group_name = azurerm_resource_group.rg.name   # Collegamento al gruppo di risorse
+
+  sku {
+    tier = "Standard"  # Tier del piano (produzione)
+    size = "S1"        # Dimensione dell'istanza
+  }
 }
 
-resource "azurerm\_app\_service" "webapp" {
-
-name = "mywebappdemo123" # Nome univoco della Web App (deve essere globale)
-
-location = azurerm\_resource\_group.rg.location # Stessa località del piano e del gruppo
-
-resource\_group\_name = azurerm\_resource\_group.rg.name # Collegamento al gruppo di risorse
-
-app\_service\_plan\_id = azurerm\_app\_service\_plan.asp.id # Collegamento al piano App Service
-
+resource "azurerm_app_service" "webapp" {
+  name                = "mywebappdemo123"                # Nome univoco della Web App
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  app_service_plan_id = azurerm_app_service_plan.asp.id
 }
-
-Plain textCopyMore options
+```
 
 Questo esempio mostra come creare un'applicazione web base su Azure con pochi blocchi Terraform. Una pipeline DevOps potrebbe poi automatizzare il deploy e il monitoraggio continuo.
 
