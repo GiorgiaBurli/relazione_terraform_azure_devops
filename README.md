@@ -150,43 +150,34 @@ L’approccio più moderno e flessibile consiste nella definizione della pipelin
 
 **Esempio di pipeline YAML**
 
+```yaml
 trigger:
-
-branches:
-
-include:
-
-\- main # La pipeline si attiva quando ci sono commit nel branch "main"
+  branches:
+    include:
+      - main  # La pipeline si attiva sui commit al branch "main"
 
 pool:
-
-vmImage: 'ubuntu-latest' # Specifica l'immagine della macchina virtuale usata come agente (Ubuntu)
+  vmImage: 'ubuntu-latest'  # Macchina virtuale dell'agente
 
 steps:
+  - checkout: self  # Clona il repository
 
-\- checkout: self # Clona il repository corrente nel workspace dell'agente
+  - task: UseTerraform@0
+    inputs:
+      terraformVersion: '1.5.0'  # Versione di Terraform
 
-\- task: UseTerraform@0 # Task di Azure DevOps per installare Terraform
+  - script: terraform init
+    displayName: 'Terraform Init'  # Inizializza la directory di lavoro
 
-inputs:
+  - script: terraform validate
+    displayName: 'Terraform Validate'  # Controlla la validità dei file
 
-terraformVersion: '1.5.0' # Specifica la versione di Terraform da usare
+  - script: terraform plan -out=tfplan
+    displayName: 'Terraform Plan'  # Genera il piano di esecuzione
 
-\- script: terraform init
-
-displayName: 'Terraform Init' # Inizializza la directory di lavoro e scarica i provider
-
-\- script: terraform validate
-
-displayName: 'Terraform Validate' # Verifica che la configurazione sia sintatticamente corretta
-
-\- script: terraform plan -out=tfplan
-
-displayName: 'Terraform Plan' # Genera un piano di esecuzione e lo salva nel file tfplan
-
-\- script: terraform apply tfplan
-
-displayName: 'Terraform Apply' # Applica il piano salvato e crea/modifica le risorse
+  - script: terraform apply tfplan
+    displayName: 'Terraform Apply'  # Applica le modifiche pianificate
+```
 
 **Scenario: Provisioning di un'infrastruttura base per un sito web aziendale**
 
