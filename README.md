@@ -20,7 +20,7 @@ Il provider azurerm è il principale strumento di interazione tra Terraform e Az
 La configurazione base del provider azurerm richiede la definizione del provider stesso all’interno di un blocco terraform, indicando la versione desiderata, seguita da un blocco provider che definisce eventuali opzioni. Un esempio tipico include la creazione di un gruppo di risorse in una specifica regione geografica. Questo tipo di risorsa rappresenta l’unità logica base in cui vengono organizzate le risorse Azure.
 
 **Esempio di configurazione:**
-
+```
 terraform {
 
 required\_providers {
@@ -50,6 +50,7 @@ name = "example-resources" # Nome del gruppo di risorse che sarà creato
 location = "West Europe" # Regione geografica in cui sarà creato il gruppo di risorse
 
 }
+```
 
 **AzureAD (Azure Active Directory)**
 
